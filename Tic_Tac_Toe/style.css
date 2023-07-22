@@ -1,0 +1,51 @@
+h2 {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    margin: 0;
+}
+
+h3 {
+    position: absolute;
+    top: 80px;
+    left: 45%;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 110vh;
+    margin: 0;
+}
+
+canvas {
+    border: 2px solid black;
+}
+
+.replay-button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.replay-button:hover {
+    background-color: blue;
+}
+
+.game-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
