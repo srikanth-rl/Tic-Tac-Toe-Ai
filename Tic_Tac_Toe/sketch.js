@@ -121,7 +121,7 @@ function draw() {
         noLoop();
         let resultP = createP('');
         resultP.style('font-size', '32pt');
-        resultP.html('Sorry Man,you lost!🤖'); //`${board[winningCombo[0]][winningCombo[1]]} wins!`
+        resultP.html('Wow,it\'s a Tie!🤓'); //`${board[winningCombo[0]][winningCombo[1]]} wins!`
     } else {
         let emptyGrid = 0;
         for (let i = 0; i < 3; i++) {
