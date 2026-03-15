@@ -1,0 +1,768 @@
+/* ============================================
+   ROOT VARIABLES & THEME
+   ============================================ */
+:root {
+  --bg-primary: #0a0e1a;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-x: #f43f5e;
+  --accent-x-glow: rgba(244, 63, 94, 0.4);
+  --accent-o: #3b82f6;
+  --accent-o-glow: rgba(59, 130, 246, 0.4);
+  --accent-tie: #a78bfa;
+  --canvas-bg: rgba(15, 23, 42, 0.85);
+  --btn-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --btn-hover: linear-gradient(135deg, #818cf8, #a78bfa);
+  --success: #34d399;
+  --warning: #fbbf24;
+}
+
+/* ============================================
+   GLOBAL RESET
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* ============================================
+   GAME WRAPPER
+   ============================================ */
+.game-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  perspective: 1000px;
+  animation: fadeInUp 0.6s ease-out;
+  max-width: 500px;
+  width: 100%;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   TITLE
+   ============================================ */
+.game-title {
+  font-family: "Orbitron", monospace;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #818cf8, #e879f9, #f43f5e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.3);
+  }
+}
+
+.subtitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.player-x {
+  color: var(--accent-x);
+  font-weight: 700;
+  font-family: "Orbitron", monospace;
+  text-shadow: 0 0 10px var(--accent-x-glow);
+}
+
+.player-o {
+  color: var(--accent-o);
+  font-weight: 700;
+  font-family: "Orbitron", monospace;
+  text-shadow: 0 0 10px var(--accent-o-glow);
+}
+
+.vs {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.subtitle small {
+  font-weight: 400;
+  opacity: 0.7;
+  font-family: "Inter", sans-serif;
+}
+
+/* ============================================
+   CONTROLS BAR — difficulty, first move, sound
+   ============================================ */
+.controls-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.control-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Segmented control buttons */
+.segment-control {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.seg-btn {
+  padding: 6px 12px;
+  font-family: "Inter", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.seg-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+.seg-btn.active {
+  color: white;
+  background: var(--btn-gradient);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* Icon button (sound toggle) */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+}
+
+.icon-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+  transform: scale(1.05);
+}
+
+/* ============================================
+   SCOREBOARD
+   ============================================ */
+.scoreboard {
+  display: flex;
+  gap: 6px;
+  animation: fadeInUp 0.5s ease-out 0.15s both;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  min-width: 78px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.score-item:hover {
+  transform: translateY(-2px);
+}
+
+.score-ai {
+  border-color: rgba(244, 63, 94, 0.15);
+}
+.score-tie {
+  border-color: rgba(167, 139, 250, 0.15);
+}
+.score-you {
+  border-color: rgba(59, 130, 246, 0.15);
+}
+
+.score-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.score-ai .score-label {
+  color: var(--accent-x);
+}
+.score-tie .score-label {
+  color: var(--accent-tie);
+}
+.score-you .score-label {
+  color: var(--accent-o);
+}
+
+.score-value {
+  font-family: "Orbitron", monospace;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.score-value.bump {
+  animation: scoreBump 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scoreBump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.score-streak {
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--warning);
+  min-height: 14px;
+}
+
+/* ============================================
+   STATUS BAR — turn indicator + info chips
+   ============================================ */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all 0.35s ease;
+  backdrop-filter: blur(10px);
+}
+
+.turn-indicator.your-turn {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.1);
+}
+
+.turn-indicator.ai-turn {
+  border-color: rgba(244, 63, 94, 0.3);
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.1);
+}
+
+.turn-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-o);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.turn-indicator.ai-turn .turn-dot {
+  background: var(--accent-x);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
+
+.status-info {
+  display: flex;
+  gap: 6px;
+}
+
+.info-chip {
+  padding: 5px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-family: "Orbitron", monospace;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   CANVAS CONTAINER
+   ============================================ */
+#canvas-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  background: var(--canvas-bg);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  animation: boardAppear 0.5s ease-out 0.2s both;
+}
+
+#canvas-container:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 12px rgba(0, 0, 0, 0.3),
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+#canvas-container.resetting {
+  animation: boardReset 0.35s ease-in-out;
+}
+
+@keyframes boardReset {
+  0% {
+    transform: scale(1) rotateY(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.88) rotateY(90deg);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes boardAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.92) rotateX(8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotateX(0deg);
+  }
+}
+
+canvas {
+  display: block;
+  border-radius: 16px;
+  border: none !important;
+}
+
+/* ============================================
+   RESULT OVERLAY
+   ============================================ */
+.result-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.result-overlay.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.result-overlay.hiding {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+  pointer-events: none;
+  transition: all 0.25s ease-in;
+}
+
+.result-content {
+  padding: 22px 36px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(99, 102, 241, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.result-content p {
+  font-family: "Orbitron", monospace;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.result-content p .winner-x {
+  color: var(--accent-x);
+  text-shadow: 0 0 20px var(--accent-x-glow);
+}
+.result-content p .winner-o {
+  color: var(--accent-o);
+  text-shadow: 0 0 20px var(--accent-o-glow);
+}
+.result-content p .tie-text {
+  color: var(--accent-tie);
+  text-shadow: 0 0 20px rgba(167, 139, 250, 0.4);
+}
+
+.result-hint {
+  font-family: "Inter", sans-serif;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  letter-spacing: 0.5px;
+  animation: hintPulse 2s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ============================================
+   ACTION BUTTONS BAR
+   ============================================ */
+.action-bar {
+  display: flex;
+  gap: 8px;
+  animation: fadeInUp 0.5s ease-out 0.4s both;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-btn {
+  color: white;
+  background: var(--btn-gradient);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+
+.primary-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.secondary-btn {
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.secondary-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.secondary-btn:active {
+  transform: translateY(0);
+}
+
+.btn-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 1.1rem;
+  transition: transform 0.35s ease;
+}
+
+.primary-btn:hover .btn-icon {
+  transform: rotate(360deg);
+}
+
+.primary-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   KEYBOARD SHORTCUTS HINT
+   ============================================ */
+.shortcuts-hint {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeInUp 0.5s ease-out 0.5s both;
+}
+
+.shortcuts-hint span {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: "Orbitron", monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  line-height: 1;
+}
+
+/* ============================================
+   STATS PANEL
+   ============================================ */
+.stats-panel {
+  display: flex;
+  gap: 16px;
+  padding: 8px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  animation: fadeInUp 0.5s ease-out 0.55s both;
+}
+
+.stat {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat strong {
+  color: var(--text-secondary);
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+}
+
+/* ============================================
+   CONFETTI
+   ============================================ */
+.confetti-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  z-index: 20;
+  pointer-events: none;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg) scale(0.3);
+  }
+}
+
+/* ============================================
+   SHAKE
+   ============================================ */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15%,
+  45%,
+  75% {
+    transform: translateX(-3px);
+  }
+  30%,
+  60%,
+  90% {
+    transform: translateX(3px);
+  }
+}
+
+#canvas-container.shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+#canvas-container.hovering {
+  cursor: pointer;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 480px) {
+  .game-wrapper {
+    gap: 8px;
+    padding: 12px 8px;
+  }
+  .controls-bar {
+    gap: 6px;
+  }
+  .seg-btn {
+    padding: 5px 8px;
+    font-size: 0.65rem;
+  }
+  .scoreboard {
+    gap: 4px;
+  }
+  .score-item {
+    padding: 5px 10px;
+    min-width: 62px;
+  }
+  .score-value {
+    font-size: 1.1rem;
+  }
+  .action-btn {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+  .shortcuts-hint {
+    display: none;
+  }
+  .stats-panel {
+    gap: 10px;
+    padding: 6px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <div class="game-wrapper">
+      <!-- Header -->
+      <h1 class="game-title">Tic Tac Toe</h1>
+      <div class="subtitle">
+        <span class="player-x">X <small id="labelX">(AI)</small></span>
+        <span class="vs">vs</span>
+        <span class="player-o">O <small id="labelO">(YOU)</small></span>
+      </div>
+
+      <!-- Controls Bar: Difficulty + First Player + Sound -->
+      <div class="controls-bar">
+        <div class="control-group">
+          <label class="control-label">Difficulty</label>
+          <div class="segment-control" id="difficultyControl">
+            <button class="seg-btn" data-val="easy">Easy</button>
+            <button class="seg-btn active" data-val="medium">Medium</button>
+            <button class="seg-btn" data-val="hard">Hard</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">First Move</label>
+          <div class="segment-control" id="firstMoveControl">
+            <button class="seg-btn active" data-val="ai">AI</button>
+            <button class="seg-btn" data-val="you">You</button>
+          </div>
+        </div>
+        <button class="icon-btn" id="soundToggle" title="Toggle Sound">
+          <span id="soundIcon">🔊</span>
+        </button>
+      </div>
+
+      <!-- Scoreboard -->
+      <div class="scoreboard">
+        <div class="score-item score-ai">
+          <span class="score-label">AI (X)</span>
+          <span class="score-value" id="scoreAI">0</span>
+          <span class="score-streak" id="streakAI"></span>
+        </div>
+        <div class="score-item score-tie">
+          <span class="score-label">Ties</span>
+          <span class="score-value" id="scoreTie">0</span>
+        </div>
+        <div class="score-item score-you">
+          <span class="score-label">You (O)</span>
+          <span class="score-value" id="scoreYou">0</span>
+          <span class="score-streak" id="streakYou"></span>
+        </div>
+      </div>
+
+      <!-- Turn indicator + Timer + Move count -->
+      <div class="status-bar">
+        <div class="turn-indicator" id="turnIndicator">
+          <span class="turn-dot"></span>
+          <span id="turnText">Your turn</span>
+        </div>
+        <div class="status-info">
+          <span class="info-chip" id="timerChip">⏱ 0:00</span>
+          <span class="info-chip" id="moveChip">Move #0</span>
+        </div>
+      </div>
+
+      <!-- p5.js canvas -->
+      <div id="canvas-container"></div>
+
+      <!-- Game result overlay -->
+      <div class="result-overlay" id="resultOverlay">
+        <div class="result-content">
+          <p id="resultText"></p>
+          <span class="result-hint">ESC · Click · Space to dismiss</span>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-bar">
+        <button
+          class="action-btn secondary-btn"
+          id="undoBtn"
+          title="Undo (Ctrl+Z)"
+        >
+          <span>↩</span> Undo
+        </button>
+        <button
+          class="action-btn primary-btn"
+          id="replayBtn"
+          title="New Game (R)"
+        >
+          <span class="btn-icon">↻</span> <span>New Game</span>
+        </button>
+        <button
+          class="action-btn secondary-btn"
+          id="resetScoreBtn"
+          title="Reset Scores"
+        >
+          <span>🗑</span> Reset
+        </button>
+      </div>
+
+      <!-- Keyboard shortcuts hint -->
+      <div class="shortcuts-hint">
+        <span><kbd>R</kbd> New Game</span>
+        <span><kbd>Z</kbd> Undo</span>
+        <span><kbd>M</kbd> Sound</span>
+        <span><kbd>1-3</kbd> Difficulty</span>
+      </div>
+
+      <!-- Stats panel -->
+      <div class="stats-panel" id="statsPanel">
+        <span class="stat">Games: <strong id="statTotal">0</strong></span>
+        <span class="stat">Win Rate: <strong id="statWinRate">0%</strong></span>
+        <span class="stat"
+          >Best Streak: <strong id="statBestStreak">0</strong></span
+        >
+      </div>
+    </div>
+
+    <script src="minimax.js"></script>
+    <script src="sketch.js"></script>
+  </body>
+</html>
