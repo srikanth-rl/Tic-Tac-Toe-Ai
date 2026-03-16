@@ -1,13 +1,44 @@
-# Tic-Tac-Toe-Ai vs Human
+# Tic-Tac-Toe AI vs Human
 
-This project implements a simple game of Tic Tac Toe where a user can play against an AI opponent. 
-The AI has been designed to make strategic moves to challenge the human player.
+A modern, interactive Tic-Tac-Toe game where you play against an AI with three difficulty levels. Built with p5.js and vanilla JavaScript.
 
 ## Features
 
-- **AI vs Human:** Play a game of Tic Tac Toe against an intelligent AI opponent.
-- **Strategic AI:** The AI makes strategic moves to block the human player and try to win the game.
-The Final output of this project!
-<img width="916" alt="image_2023-11-21_22-47-50" src="https://github.com/Srikanth2810/Tic-Tac-Toe-Ai/assets/98140086/d16a14f5-17f1-4358-b452-edb78fd19710">
-<img width="920" alt="image_2023-11-21_22-47-50" src="https://github.com/Srikanth2810/Tic-Tac-Toe-Ai/assets/98140086/359c6041-a8a4-4e52-834e-d3e418403364">
-<img width="922" alt="image_2023-11-21_22-47-51" src="https://github.com/Srikanth2810/Tic-Tac-Toe-Ai/assets/98140086/4f0745c9-1c98-4296-a693-7911e02ee760">
+- **AI vs Human:** Play against an AI that adapts to your chosen difficulty.
+- **Difficulty Levels:**
+  - Easy: AI plays randomly.
+  - Medium: AI mixes optimal and random moves.
+  - Hard: AI uses the minimax algorithm and picks the best move.
+- **Undo:** Undo your last move .
+- **Sound Effects:** Responsive, adjustable sound for every move and result.
+- **Scoreboard & Stats:** Tracks wins, ties, streaks, and win rate.
+- **Responsive UI:** Clean, modern design with keyboard shortcuts.
+- **No External Dependencies:** All logic and sound are implemented in-browser.
+
+## Keyboard Shortcuts
+
+- `N` — New Game
+- `Z` — Undo
+- `M` — Toggle Sound
+- `1`, `2`, `3` — Set Difficulty
+
+## Installation & Project Setup
+
+You can run this project locally in just a few steps:
+
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/srikanth-rl/Tic-Tac-Toe-Ai.git
+   cd Tic-Tac-Toe-Ai
+   ```
+2. **No build or install required!**
+   - All dependencies are included via CDN (p5.js) and the project is pure HTML/CSS/JS.
+
+3. **Start the game:**
+   - Open `index.html` in your web browser (double-click or right-click and choose "Open with browser").
+
+4. **Play!**
+   - Use the controls and keyboard shortcuts to enjoy the game.
+
+5. **Website!**
+   - [Play the game online!](https://srikanth-tic-tac-toe-ai.vercel.app/)

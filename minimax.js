@@ -14,6 +14,18 @@ function bestMove() {
     }
     // hard = never random (always optimal)
 
+    // Hard mode: randomize first opening move only
+    if (difficulty === 'hard' && moveHistory.length === 0) {
+        let openingMoves = [
+            { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 },
+            { i: 1, j: 0 }, { i: 1, j: 1 }, { i: 1, j: 2 },
+            { i: 2, j: 0 }, { i: 2, j: 1 }, { i: 2, j: 2 }
+        ];
+        let move = openingMoves[Math.floor(Math.random() * openingMoves.length)];
+        placeAI(move.i, move.j);
+        return;
+    }
+
     if (useRandom) {
         randomMove();
         return;
