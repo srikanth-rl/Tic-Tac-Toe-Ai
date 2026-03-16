@@ -1,14 +1,14 @@
-# Tic-Tac-Toe AI vs Human
+# Tic-Tac-Toe Bot vs Human
 
-A modern, interactive Tic-Tac-Toe game where you play against an AI with three difficulty levels. Built with p5.js and vanilla JavaScript.
+A modern, interactive Tic-Tac-Toe game where you play against a bot with three difficulty levels. Built with p5.js and vanilla JavaScript.
 
 ## Features
 
-- **AI vs Human:** Play against an AI that adapts to your chosen difficulty.
+- **Bot vs Human:** Play against a bot that adapts to your chosen difficulty.
 - **Difficulty Levels:**
-  - Easy: AI plays randomly.
-  - Medium: AI mixes optimal and random moves.
-  - Hard: AI uses the minimax algorithm and picks the best move.
+  - Easy: Bot plays randomly.
+  - Medium: Bot mixes optimal and random moves.
+  - Hard: Bot uses the minimax algorithm and picks the best move.
 - **Undo:** Undo your last move .
 - **Sound Effects:** Responsive, adjustable sound for every move and result.
 - **Scoreboard & Stats:** Tracks wins, ties, streaks, and win rate.
@@ -28,8 +28,8 @@ You can run this project locally in just a few steps:
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/srikanth-rl/Tic-Tac-Toe-Ai.git
-   cd Tic-Tac-Toe-Ai
+   git clone https://github.com/srikanth-rl/Tic-Tac-Toe-Bot.git
+   cd Tic-Tac-Toe-Bot
    ```
 2. **No build or install required!**
    - All dependencies are included via CDN (p5.js) and the project is pure HTML/CSS/JS.
@@ -41,4 +41,4 @@ You can run this project locally in just a few steps:
    - Use the controls and keyboard shortcuts to enjoy the game.
 
 5. **Website!**
-   - [Play the game online!](https://srikanth-tic-tac-toe-ai.vercel.app/)
+   - [Play the game online!](https://tic-tac-toe-bot-game.vercel.app/)

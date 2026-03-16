@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tic Tac Toe AI</title>
+    <title>Tic Tac Toe Bot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap"
@@ -13,154 +13,182 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7826474200851907"
      crossorigin="anonymous"></script>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png" />
+
+    <style>
+      /* Wrapper to hold ads and game without touching game internal styles */
+      .ads-main-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      /* Sidebar Ad Styles */
+      .side-ad-container {
+        flex: 1;
+        max-width: 300px; /* Fits standard skyscraper ads */
+        min-width: 160px;
+        margin-top: 100px; /* Matches game board vertical position */
+      }
+
+      /* Bottom Ad for Mobile */
+      .mobile-footer-ad {
+        display: none;
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      /* Responsive logic: Hide sides on small screens, show bottom ad */
+      @media (max-width: 1200px) {
+        .side-ad-container {
+          display: none;
+        }
+        .mobile-footer-ad {
+          display: block;
+        }
+      }
+    </style>
   </head>
 
   <body>
     
-    <div class="game-wrapper">
-      <!-- Header -->
-      <h1 class="game-title">Tic Tac Toe</h1>
-      <!-- Top Info Row: Shortcuts + Stats -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 10px; margin-bottom: 8px;">
+    <div class="ads-main-container">
+      
+      <aside class="side-ad-container">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7826474200851907"
+             data-ad-slot="4062579331"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </aside>
+
+      <div class="game-wrapper">
+        <h1 class="game-title">Tic Tac Toe</h1>
+        
         <div class="subtitle">
-          <span class="player-x">X <small id="labelX">(AI)</small></span>
+          <span class="player-x">X <small id="labelX">(BOT)</small></span>
           <span class="vs">vs</span>
           <span class="player-o">O <small id="labelO">(YOU)</small></span>
         </div>
-        <div class="shortcuts-hint" style="margin-bottom: 0;">
-          <span><kbd>N</kbd> New Game</span>
-          <span><kbd>Z</kbd> Undo</span>
-          <span><kbd>M</kbd> Sound</span>
-          <span><kbd>1-3</kbd> Difficulty</span>
-        </div>
-        <div class="stats-panel" id="statsPanel" style="margin-bottom: 0;">
-          <span class="stat">Games: <strong id="statTotal">0</strong></span>
-          <span class="stat">Win Rate: <strong id="statWinRate">0%</strong></span>
-          <span class="stat">Best Streak: <strong id="statBestStreak">0</strong></span>
-        </div>
-      </div>
 
-      <!-- Controls Bar: Difficulty + First Player + Sound -->
-      <div class="controls-bar">
-        <div class="control-group">
-          <label class="control-label">Difficulty</label>
-          <div class="segment-control" id="difficultyControl">
-            <button class="seg-btn" data-val="easy">Easy</button>
-            <button class="seg-btn active" data-val="medium">Medium</button>
-            <button class="seg-btn" data-val="hard">Hard</button>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 10px; margin: 1px 0;">
+          <div class="shortcuts-hint" style="margin-bottom: 0;">
+            <span><kbd>N</kbd> New Game</span>
+            <span><kbd>Z</kbd> Undo</span>
+            <span><kbd>M</kbd> Sound</span>
+            <span><kbd>1-3</kbd> Difficulty</span>
+          </div>
+          <div class="stats-panel" id="statsPanel" style="margin-bottom: 0;">
+            <span class="stat">Games: <strong id="statTotal">0</strong></span>
+            <span class="stat">Win Rate: <strong id="statWinRate">0%</strong></span>
+            <span class="stat">Best Streak: <strong id="statBestStreak">0</strong></span>
           </div>
         </div>
-        <div class="control-group">
-          <label class="control-label">First Move</label>
-          <div class="segment-control" id="firstMoveControl">
-            <button class="seg-btn active" data-val="ai">AI</button>
-            <button class="seg-btn" data-val="you">You</button>
+
+        <div class="controls-bar">
+          <div class="control-group">
+            <label class="control-label">Difficulty</label>
+            <div class="segment-control" id="difficultyControl">
+              <button class="seg-btn" data-val="easy">Easy</button>
+              <button class="seg-btn active" data-val="medium">Medium</button>
+              <button class="seg-btn" data-val="hard">Hard</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">First Move</label>
+            <div class="segment-control" id="firstMoveControl">
+              <button class="seg-btn active" data-val="bot">Bot</button>
+              <button class="seg-btn" data-val="you">You</button>
+            </div>
+          </div>
+          <button class="icon-btn" id="soundToggle" title="Toggle Sound">
+            <span id="soundIcon">🔊</span>
+          </button>
+        </div>
+
+        <div class="scoreboard">
+          <div class="score-item score-ai">
+            <span class="score-label">Bot</span>
+            <span class="score-value" id="scoreAI">0</span>
+            <span class="score-streak" id="streakAI"></span>
+          </div>
+          <div class="score-item score-tie">
+            <span class="score-label">Ties</span>
+            <span class="score-value" id="scoreTie">0</span>
+          </div>
+          <div class="score-item score-you">
+            <span class="score-label">You</span>
+            <span class="score-value" id="scoreYou">0</span>
+            <span class="score-streak" id="streakYou"></span>
           </div>
         </div>
-        <button class="icon-btn" id="soundToggle" title="Toggle Sound">
-          <span id="soundIcon">🔊</span>
-        </button>
+
+        <div class="status-bar">
+          <div class="turn-indicator" id="turnIndicator">
+            <span class="turn-dot"></span>
+            <span id="turnText">Your turn</span>
+          </div>
+          <div class="status-info">
+            <span class="info-chip" id="timerChip">⏱ 0:00</span>
+            <span class="info-chip" id="moveChip">Move #0</span>
+          </div>
+        </div>
+
+        <div id="canvas-container"></div>
+
+        <div class="result-overlay" id="resultOverlay">
+          <div class="result-content">
+            <p id="resultText"></p>
+            <span class="result-hint">Click / ESC / Space to dismiss</span>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="action-btn secondary-btn" id="undoBtn" title="Undo (Z)">
+            <span>↩</span> Undo
+          </button>
+          <button class="action-btn primary-btn" id="replayBtn" title="New Game (N)">
+            <span class="btn-icon">↻</span> <span>New Game</span>
+          </button>
+          <button class="action-btn secondary-btn" id="resetScoreBtn" title="Reset Scores">
+            <span>🗑</span> Reset
+          </button>
+        </div>
+
+        <div class="mobile-footer-ad">
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-7826474200851907"
+               data-ad-slot="4062579331"
+               data-ad-format="horizontal"
+               data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
       </div>
 
-      <!-- Scoreboard -->
-      <div class="scoreboard">
-        <div class="score-item score-ai">
-          <span class="score-label">AI</span>
-          <span class="score-value" id="scoreAI">0</span>
-          <span class="score-streak" id="streakAI"></span>
-        </div>
-        <div class="score-item score-tie">
-          <span class="score-label">Ties</span>
-          <span class="score-value" id="scoreTie">0</span>
-        </div>
-        <div class="score-item score-you">
-          <span class="score-label">You</span>
-          <span class="score-value" id="scoreYou">0</span>
-          <span class="score-streak" id="streakYou"></span>
-        </div>
-      </div>
+      <aside class="side-ad-container">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7826474200851907"
+             data-ad-slot="2383534720"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </aside>
 
-      <!-- Turn indicator + Timer + Move count -->
-      <div class="status-bar">
-        <div class="turn-indicator" id="turnIndicator">
-          <span class="turn-dot"></span>
-          <span id="turnText">Your turn</span>
-        </div>
-        <div class="status-info">
-          <span class="info-chip" id="timerChip">⏱ 0:00</span>
-          <span class="info-chip" id="moveChip">Move #0</span>
-        </div>
-      </div>
-
-      <!-- p5.js canvas -->
-      <div id="canvas-container"></div>
-
-      <!-- Game result overlay -->
-      <div class="result-overlay" id="resultOverlay">
-        <div class="result-content">
-          <p id="resultText"></p>
-          <span class="result-hint">Click / ESC / Space to dismiss</span>
-        </div>
-      </div>
-
-      <!-- Action buttons -->
-      <div class="action-bar">
-        <button
-          class="action-btn secondary-btn"
-          id="undoBtn"
-          title="Undo (Z)"
-        >
-          <span>↩</span> Undo
-        </button>
-        <button
-          class="action-btn primary-btn"
-          id="replayBtn"
-          title="New Game (N)"
-        >
-          <span class="btn-icon">↻</span> <span>New Game</span>
-        </button>
-        <button
-          class="action-btn secondary-btn"
-          id="resetScoreBtn"
-          title="Reset Scores"
-        >
-          <span>🗑</span> Reset
-        </button>
-      </div>
-
-      <!-- Keyboard shortcuts and stats moved to top -->
-    </div>
-
-    <!-- Top Banner Ad -->
-    <div class="ad-container ad-top" style="text-align: center; margin: 15px 0;">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
-           data-ad-slot="xxxxxxxx"
-           data-ad-format="horizontal"
-           data-full-width-responsive="true"></ins>
-      <script>
-           (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
-
-    <!-- Side Ad (optional) -->
-    <div class="ad-container ad-side" style="text-align: center; margin: 15px 0;">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"
-           data-ad-slot="yyyyyyyy"
-           data-ad-format="rectangle"
-           data-full-width-responsive="true"></ins>
-      <script>
-           (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
     </div>
 
     <script src="minimax.js"></script>

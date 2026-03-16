@@ -64,7 +64,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 5.5px;
   padding: 1px 1px;
   perspective: 1000px;
   animation: fadeInUp 0.6s ease-out;
@@ -253,7 +253,7 @@ body {
   transform: translateY(-2px);
 }
 
-.score-ai {
+.score-bot {
   border-color: rgba(244, 63, 94, 0.15);
 }
 .score-tie {
@@ -271,7 +271,7 @@ body {
   color: var(--text-secondary);
 }
 
-.score-ai .score-label {
+.score-bot .score-label {
   color: var(--accent-x);
 }
 .score-tie .score-label {
@@ -343,7 +343,7 @@ body {
   box-shadow: 0 0 16px rgba(59, 130, 246, 0.1);
 }
 
-.turn-indicator.ai-turn {
+.turn-indicator.bot-turn {
   border-color: rgba(244, 63, 94, 0.3);
   box-shadow: 0 0 16px rgba(244, 63, 94, 0.1);
 }
@@ -356,7 +356,7 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-.turn-indicator.ai-turn .turn-dot {
+.turn-indicator.bot-turn .turn-dot {
   background: var(--accent-x);
 }
 
