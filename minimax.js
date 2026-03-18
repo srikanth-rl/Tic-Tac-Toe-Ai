@@ -1,20 +1,17 @@
 /* ============================================
-   AI BEST MOVE — with difficulty levels
+   BOT BEST MOVE — with difficulty levels
    easy:       random move
    medium:     50% optimal, 50% random
    hard:       always optimal (minimax)
    ============================================ */
-function bestMove() {
-    // Difficulty-based random chance
+function bestMove(silent = false) {
     let useRandom = false;
     if (difficulty === 'easy') {
         useRandom = true;
     } else if (difficulty === 'medium') {
         useRandom = Math.random() < 0.5;
     }
-    // hard = never random (always optimal)
 
-    // Hard mode: randomize first opening move only
     if (difficulty === 'hard' && moveHistory.length === 0) {
         let openingMoves = [
             { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 },
@@ -22,23 +19,22 @@ function bestMove() {
             { i: 2, j: 0 }, { i: 2, j: 1 }, { i: 2, j: 2 }
         ];
         let move = openingMoves[Math.floor(Math.random() * openingMoves.length)];
-        placeAI(move.i, move.j);
+        placeBot(move.i, move.j, silent);
         return;
     }
 
     if (useRandom) {
-        randomMove();
+        randomMove(silent);
         return;
     }
 
-    // Optimal minimax move
     let bestScore = -Infinity;
     let minDepth = Infinity;
     let move = { i: 0, j: 0 };
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
             if (board[i][j] == '') {
-                board[i][j] = ai;
+                board[i][j] = bot;
                 let r = minimax(board, 0, false);
                 let score = r.s;
                 let depth = r.d;
@@ -54,13 +50,10 @@ function bestMove() {
             }
         }
     }
-    placeAI(move.i, move.j);
+    placeBot(move.i, move.j, silent);
 }
 
-/* ============================================
-   RANDOM MOVE — for easier difficulty
-   ============================================ */
-function randomMove() {
+function randomMove(silent = false) {
     let available = [];
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
@@ -69,39 +62,30 @@ function randomMove() {
     }
     if (available.length === 0) return;
     let pick = available[Math.floor(Math.random() * available.length)];
-    placeAI(pick.i, pick.j);
+    placeBot(pick.i, pick.j, silent);
 }
 
-/* ============================================
-   PLACE AI PIECE — shared placement logic
-   ============================================ */
-function placeAI(i, j) {
-    board[i][j] = ai;
+function placeBot(i, j, silent = false) {
+    board[i][j] = bot;
     if (typeof cellPlacedTime !== 'undefined') {
         cellPlacedTime[i][j] = millis();
         cellAnimating[i][j] = true;
     }
     if (typeof moveHistory !== 'undefined') {
-        moveHistory.push({ i, j, player: ai });
+        moveHistory.push({ i, j, player: bot });
     }
-    if (typeof sndAIPlace === 'function') {
-        sndAIPlace();
+    if (!silent && typeof sndBotPlace === 'function') {
+        sndBotPlace();
     }
     currentPlayer = human;
 }
 
-/* ============================================
-   SCORING
-   ============================================ */
 let scores = {
     X: 10,
     O: -10,
     tie: 0
 };
 
-/* ============================================
-   MINIMAX — unbeatable AI with alpha-beta
-   ============================================ */
 function minimax(board, depth, isMaximizing, alpha, beta) {
     let result = checkWinner();
     if (result !== null) {
@@ -117,7 +101,7 @@ function minimax(board, depth, isMaximizing, alpha, beta) {
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
                 if (board[i][j] == '') {
-                    board[i][j] = ai;
+                    board[i][j] = bot;
                     let r = minimax(board, depth + 1, false, alpha, beta);
                     board[i][j] = '';
                     if (r.s > bestScore) {

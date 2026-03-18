@@ -3,7 +3,7 @@
    ============================================ */
 let board = [['', '', ''], ['', '', ''], ['', '', '']];
 let w, h;
-let ai = 'X';
+let bot = 'X';
 let human = 'O';
 let currentPlayer = human;
 let winningCombo = null;
@@ -12,15 +12,15 @@ let winningCombo = null;
    SETTINGS & PERSISTENCE
    ============================================ */
 let difficulty = 'medium';    // easy | medium | hard
-let aiGoesFirst = true;
+let botGoesFirst = true;
 let soundEnabled = true;
 
 /* ============================================
    SCORE & STATS
    ============================================ */
-let scoreAI = 0, scoreTie = 0, scoreYou = 0;
-let streakAI = 0, streakYou = 0;
-let bestStreakYou = 0, bestStreakAI = 0;
+let scoreBot = 0, scoreTie = 0, scoreYou = 0;
+let streakBot = 0, streakYou = 0;
+let bestStreakYou = 0, bestStreakBot = 0;
 let totalGames = 0;
 
 /* ============================================
@@ -61,8 +61,7 @@ const COLORS = {
 };
 
 /* ============================================
-   WEB AUDIO — lightweight sound effects
-   No external files needed
+   WEB AUDIO
    ============================================ */
 let audioCtx = null;
 
@@ -87,15 +86,13 @@ function playTone(freq, duration, type, vol) {
 }
 
 function sndPlace() { playTone(600, 0.08, 'sine', 0.50); }
-function sndAIPlace() { playTone(400, 0.1, 'triangle', 0.45); }
+function sndBotPlace() { playTone(400, 0.1, 'triangle', 0.45); }
 function sndWin() { playTone(523, 0.1, 'sine', 0.60); setTimeout(() => playTone(659, 0.1, 'sine', 0.60), 100); setTimeout(() => playTone(784, 0.2, 'sine', 0.65), 200); }
 function sndLose() { playTone(300, 0.15, 'sawtooth', 0.50); setTimeout(() => playTone(250, 0.2, 'sawtooth', 0.50), 150); }
 function sndTie() { playTone(440, 0.12, 'triangle', 0.55); setTimeout(() => playTone(440, 0.12, 'triangle', 0.55), 150); }
 function sndUndo() { playTone(500, 0.06, 'sine', 0.40); }
 function sndError() { playTone(200, 0.1, 'square', 0.35); }
 function sndReset() { playTone(800, 0.05, 'sine', 0.50); setTimeout(() => playTone(600, 0.05, 'sine', 0.50), 50); }
-
-
 
 /* ============================================
    CONFETTI
@@ -118,21 +115,21 @@ function spawnConfetti(count) {
 }
 
 /* ============================================
-   LOCAL STORAGE — persist scores & settings
+   LOCAL STORAGE
    ============================================ */
 function saveState() {
     try {
         localStorage.setItem('ttt_state', JSON.stringify({
             difficulty,
-            aiGoesFirst,
+            botGoesFirst,
             soundEnabled,
-            scoreAI,
+            scoreBot,
             scoreTie,
             scoreYou,
-            streakAI,
+            streakBot,
             streakYou,
             bestStreakYou,
-            bestStreakAI,
+            bestStreakBot,
             totalGames
         }));
     } catch (e) { }
@@ -143,15 +140,15 @@ function loadState() {
         const s = JSON.parse(localStorage.getItem('ttt_state'));
         if (!s) return;
         difficulty = s.difficulty || 'medium';
-        aiGoesFirst = s.aiGoesFirst !== undefined ? s.aiGoesFirst : true;
+        botGoesFirst = s.botGoesFirst !== undefined ? s.botGoesFirst : true;
         soundEnabled = s.soundEnabled !== undefined ? s.soundEnabled : true;
-        if (s.scoreAI !== undefined) scoreAI = s.scoreAI;
+        if (s.scoreBot !== undefined) scoreBot = s.scoreBot;
         if (s.scoreTie !== undefined) scoreTie = s.scoreTie;
         if (s.scoreYou !== undefined) scoreYou = s.scoreYou;
-        if (s.streakAI !== undefined) streakAI = s.streakAI;
+        if (s.streakBot !== undefined) streakBot = s.streakBot;
         if (s.streakYou !== undefined) streakYou = s.streakYou;
         if (s.bestStreakYou !== undefined) bestStreakYou = s.bestStreakYou;
-        if (s.bestStreakAI !== undefined) bestStreakAI = s.bestStreakAI;
+        if (s.bestStreakBot !== undefined) bestStreakBot = s.bestStreakBot;
         if (s.totalGames !== undefined) totalGames = s.totalGames;
     } catch (e) { }
 }
@@ -168,21 +165,18 @@ function setup() {
 
     initAudio();
     loadState();
-
-    // Wire controls
     wireControls();
-
-    // Apply loaded settings to UI
     applySettingsToUI();
 
-    // Start game
-    // Only let AI make first move if board is empty and not restoring from saved state
-    if (aiGoesFirst && board.every(row => row.every(cell => cell === ''))) {
-        bestMove();
+    if (botGoesFirst && board.every(row => row.every(cell => cell === ''))) {
+        currentPlayer = bot;
+        bestMove(true); // Pass true to skip sound and show correct turn
+    } else {
+        currentPlayer = human;
     }
+
     startTimer();
     updateTurnIndicator();
-    // Update scoreboard/stats from loaded state
     updateScoreboard();
     updateStats();
 }
@@ -191,23 +185,18 @@ function setup() {
    WIRE UI CONTROLS
    ============================================ */
 function wireControls() {
-    // Replay
     let replayBtn = document.getElementById('replayBtn');
     if (replayBtn) replayBtn.addEventListener('click', (e) => { e.preventDefault(); resetGame(); });
 
-    // Undo
     let undoBtn = document.getElementById('undoBtn');
     if (undoBtn) undoBtn.addEventListener('click', (e) => { e.preventDefault(); undoMove(); });
 
-    // Reset scores
     let resetScoreBtn = document.getElementById('resetScoreBtn');
     if (resetScoreBtn) resetScoreBtn.addEventListener('click', (e) => { e.preventDefault(); resetScores(); });
 
-    // Sound toggle
     let soundToggle = document.getElementById('soundToggle');
     if (soundToggle) soundToggle.addEventListener('click', () => toggleSound());
 
-    // Difficulty buttons
     document.querySelectorAll('#difficultyControl .seg-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             document.querySelectorAll('#difficultyControl .seg-btn').forEach(b => b.classList.remove('active'));
@@ -218,18 +207,16 @@ function wireControls() {
         });
     });
 
-    // First move buttons
     document.querySelectorAll('#firstMoveControl .seg-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             document.querySelectorAll('#firstMoveControl .seg-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            aiGoesFirst = this.dataset.val === 'ai';
+            botGoesFirst = this.dataset.val === 'bot'; 
             saveState();
             resetGame();
         });
     });
 
-    // ESC / Space to dismiss overlay
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' || e.key === ' ') {
             if (document.getElementById('resultOverlay').classList.contains('show')) {
@@ -237,7 +224,6 @@ function wireControls() {
                 dismissResult();
             }
         }
-        // Keyboard shortcuts
         if (e.key === 'n' || e.key === 'N') { if (!e.ctrlKey && !e.metaKey) resetGame(); }
         if (e.key === 'z' || e.key === 'Z') { if (!e.ctrlKey && !e.metaKey) undoMove(); }
         if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undoMove(); }
@@ -247,7 +233,6 @@ function wireControls() {
         if (e.key === '3') setDifficulty('hard');
     });
 
-    // Click overlay to dismiss
     let overlay = document.getElementById('resultOverlay');
     if (overlay) overlay.addEventListener('click', () => dismissResult());
 }
@@ -262,15 +247,12 @@ function setDifficulty(d) {
 }
 
 function applySettingsToUI() {
-    // Difficulty
     document.querySelectorAll('#difficultyControl .seg-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.val === difficulty);
     });
-    // First move
     document.querySelectorAll('#firstMoveControl .seg-btn').forEach(b => {
-        b.classList.toggle('active', (b.dataset.val === 'ai') === aiGoesFirst);
+        b.classList.toggle('active', (b.dataset.val === 'bot') === botGoesFirst);
     });
-    // Sound
     updateSoundIcon();
 }
 
@@ -287,7 +269,7 @@ function updateSoundIcon() {
 }
 
 /* ============================================
-   WINNER CHECK — original logic
+   WINNER CHECK
    ============================================ */
 function equal(a, b, c) {
     return a == b && b == c && a != '';
@@ -315,15 +297,10 @@ function checkWinner() {
    MOUSE PRESSED
    ============================================ */
 function mousePressed() {
-    // Resume audio context on first interaction (browser policy)
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
-
-    // Disable all moves after game is finished or if AI has won
     let winner = checkWinner();
-    if (gameEnded || winner === ai) {
-        return;
-    }
+    if (gameEnded || winner === bot) return;
 
     if (currentPlayer == human && !isResetting) {
         let i = floor(mouseX / w);
@@ -339,19 +316,17 @@ function mousePressed() {
             updateTurnIndicator();
             updateMoveCount();
 
-            // Check if game is over (win or tie) before letting AI move
             let result = checkWinner();
             if (!gameEnded && result === null) {
-                currentPlayer = ai;
-                // Show AI thinking icon for 0.1s
-                updateTurnIndicator('thinking');
+                currentPlayer = bot;
+                updateTurnIndicator();
                 setTimeout(() => {
                     if (!gameEnded) {
                         bestMove();
                         updateTurnIndicator();
                         updateMoveCount();
                     }
-                },225);
+                }, 225);
             }
         } else {
             sndError();
@@ -363,27 +338,17 @@ function mousePressed() {
 }
 
 /* ============================================
-   UNDO MOVE — removes last human + AI pair
+   UNDO MOVE
    ============================================ */
 function undoMove() {
-    // Disable undo after game is finished
-    if (gameEnded || isResetting || moveHistory.length === 0) {
-        return;
-    }
+    if (gameEnded || isResetting || moveHistory.length === 0) return;
+    if (botGoesFirst && moveHistory.length === 1) return;
 
-    // Prevent undoing the first AI move if AI goes first
-    if (aiGoesFirst && moveHistory.length === 1) {
-        // Do not play any sound at all, just ignore
-        return;
-    }
-
-    // Undo AI move first (if last was AI)
-    if (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].player === ai) {
+    if (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].player === bot) {
         let last = moveHistory.pop();
         board[last.i][last.j] = '';
         cellAnimating[last.i][last.j] = false;
     }
-    // Then undo human move
     if (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].player === human) {
         let last = moveHistory.pop();
         board[last.i][last.j] = '';
@@ -393,10 +358,10 @@ function undoMove() {
     winningCombo = null;
     winLineProgress = 0;
     currentPlayer = human;
-    // Only play undo sound if undo actually happened
     sndUndo();
     updateTurnIndicator();
     updateMoveCount();
+    loop(); 
 }
 
 /* ============================================
@@ -407,7 +372,6 @@ function resetGame() {
     isResetting = true;
     sndReset();
     dismissResult();
-    // Save state (with current scores) before resetting board
     saveState();
 
     let container = document.getElementById('canvas-container');
@@ -416,7 +380,6 @@ function resetGame() {
         setTimeout(() => container.classList.remove('resetting'), 350);
     }
 
-    // Reset state instantly — animation is non-blocking visual only
     setTimeout(() => {
         board = [['', '', ''], ['', '', ''], ['', '', '']];
         cellPlacedTime = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
@@ -425,12 +388,15 @@ function resetGame() {
         winLineProgress = 0;
         gameEnded = false;
         moveHistory = [];
-        currentPlayer = human;
-
+        
         loop();
-        if (aiGoesFirst) {
-            bestMove();
+        if (botGoesFirst) {
+            currentPlayer = bot;
+            bestMove(true); // Silent move for first turn
+        } else {
+            currentPlayer = human;
         }
+        
         startTimer();
         updateTurnIndicator();
         updateMoveCount();
@@ -442,13 +408,12 @@ function resetGame() {
    RESET SCORES
    ============================================ */
 function resetScores() {
-    scoreAI = 0; scoreTie = 0; scoreYou = 0;
-    streakAI = 0; streakYou = 0;
-    bestStreakAI = 0; bestStreakYou = 0;
+    scoreBot = 0; scoreTie = 0; scoreYou = 0;
+    streakBot = 0; streakYou = 0;
+    bestStreakBot = 0; bestStreakYou = 0;
     totalGames = 0;
     updateScoreboard();
     updateStats();
-    // Clear storage on score reset
     localStorage.removeItem('ttt_state');
     resetGame();
 }
@@ -494,17 +459,13 @@ function dismissResult() {
 }
 
 function updateScoreboard() {
-    let elAI = document.getElementById('scoreAI');
-    let elTie = document.getElementById('scoreTie');
-    let elYou = document.getElementById('scoreYou');
-    if (elAI) elAI.textContent = scoreAI;
-    if (elTie) elTie.textContent = scoreTie;
-    if (elYou) elYou.textContent = scoreYou;
+    if (document.getElementById('scoreBot')) document.getElementById('scoreBot').textContent = scoreBot;
+    if (document.getElementById('scoreTie')) document.getElementById('scoreTie').textContent = scoreTie;
+    if (document.getElementById('scoreYou')) document.getElementById('scoreYou').textContent = scoreYou;
 
-    // Streaks
-    let sAI = document.getElementById('streakAI');
+    let sBot = document.getElementById('streakBot');
     let sYou = document.getElementById('streakYou');
-    if (sAI) sAI.textContent = streakAI > 1 ? '🔥' + streakAI : '';
+    if (sBot) sBot.textContent = streakBot > 1 ? '🔥' + streakBot : '';
     if (sYou) sYou.textContent = streakYou > 1 ? '🔥' + streakYou : '';
 }
 
@@ -514,12 +475,11 @@ function bumpScore(elementId) {
 }
 
 function updateStats() {
-    let elTotal = document.getElementById('statTotal');
-    let elWinRate = document.getElementById('statWinRate');
-    let elBest = document.getElementById('statBestStreak');
-    if (elTotal) elTotal.textContent = totalGames;
-    if (elWinRate) elWinRate.textContent = totalGames > 0 ? Math.round(scoreYou / totalGames * 100) + '%' : '0%';
-    if (elBest) elBest.textContent = bestStreakYou;
+    if (document.getElementById('statTotal')) document.getElementById('statTotal').textContent = totalGames;
+    if (document.getElementById('statWinRate')) {
+        document.getElementById('statWinRate').textContent = totalGames > 0 ? Math.round(scoreYou / totalGames * 100) + '%' : '0%';
+    }
+    if (document.getElementById('statBestStreak')) document.getElementById('statBestStreak').textContent = bestStreakYou;
 }
 
 function updateTurnIndicator() {
@@ -535,8 +495,8 @@ function updateTurnIndicator() {
         indicator.className = 'turn-indicator your-turn';
         turnText.textContent = 'Your turn (O)';
     } else {
-        indicator.className = 'turn-indicator ai-turn';
-        turnText.textContent = 'AI thinking...';
+        indicator.className = 'turn-indicator bot-turn';
+        turnText.textContent = 'Bot thinking...';
     }
 }
 
@@ -562,7 +522,7 @@ function easeOutCubic(t) {
 }
 
 /* ============================================
-   DRAW — main render loop
+   DRAW
    ============================================ */
 function draw() {
     background(COLORS.bg[0], COLORS.bg[1], COLORS.bg[2]);
@@ -571,19 +531,16 @@ function draw() {
     hoveredJ = floor(mouseY / h);
     let isHovering = hoveredI >= 0 && hoveredI < 3 && hoveredJ >= 0 && hoveredJ < 3;
 
-    // Cursor
     let container = document.getElementById('canvas-container');
     if (container) {
         container.classList.toggle('hovering',
             isHovering && !gameEnded && currentPlayer === human && board[hoveredI][hoveredJ] === '');
     }
 
-    // Ghost preview + hover highlight
     if (isHovering && !gameEnded && currentPlayer === human && board[hoveredI][hoveredJ] === '') {
         noStroke();
         fill(COLORS.hover[0], COLORS.hover[1], COLORS.hover[2], COLORS.hover[3]);
         rect(hoveredI * w, hoveredJ * h, w, h, 4);
-        // Ghost O
         let gx = hoveredI * w + w / 2, gy = hoveredJ * h + h / 2, gr = w / 4;
         noFill();
         stroke(COLORS.o[0], COLORS.o[1], COLORS.o[2], 35);
@@ -591,19 +548,16 @@ function draw() {
         ellipse(gx, gy, gr * 2, gr * 2);
     }
 
-    // Grid glow
     stroke(COLORS.gridGlow[0], COLORS.gridGlow[1], COLORS.gridGlow[2], 35);
     strokeWeight(6);
     line(w, 8, w, height - 8); line(w * 2, 8, w * 2, height - 8);
     line(8, h, width - 8, h); line(8, h * 2, width - 8, h * 2);
 
-    // Grid main
     stroke(COLORS.grid[0], COLORS.grid[1], COLORS.grid[2]);
     strokeWeight(2);
     line(w, 8, w, height - 8); line(w * 2, 8, w * 2, height - 8);
     line(8, h, width - 8, h); line(8, h * 2, width - 8, h * 2);
 
-    // Draw X and O
     for (let j = 0; j < 3; j++) {
         for (let i = 0; i < 3; i++) {
             let x = w * i + w / 2, y = h * j + h / 2;
@@ -631,7 +585,7 @@ function draw() {
                 stroke(COLORS.o[0], COLORS.o[1], COLORS.o[2], ca);
                 strokeWeight(4);
                 ellipse(x, y, cr * 2, cr * 2);
-            } else if (spot == ai) {
+            } else if (spot == bot) {
                 stroke(COLORS.xGlow[0], COLORS.xGlow[1], COLORS.xGlow[2], COLORS.xGlow[3] * animProgress);
                 strokeWeight(8);
                 line(x - cr, y - cr, x + cr, y + cr);
@@ -644,26 +598,13 @@ function draw() {
         }
     }
 
-    // Check winning combos after all cells are drawn
     if (winningCombo === null) {
-        for (let i = 0; i < 3; i++) {
-            if (equal(board[i][0], board[i][1], board[i][2]))
-                winningCombo = [i, 0, i, 2];
-        }
-    }
-    if (winningCombo === null) {
-        for (let j = 0; j < 3; j++) {
-            if (equal(board[0][j], board[1][j], board[2][j]))
-                winningCombo = [0, j, 2, j];
-        }
+        for (let i = 0; i < 3; i++) if (equal(board[i][0], board[i][1], board[i][2])) winningCombo = [i, 0, i, 2];
+        for (let j = 0; j < 3; j++) if (equal(board[0][j], board[1][j], board[2][j])) winningCombo = [0, j, 2, j];
+        if (equal(board[0][0], board[1][1], board[2][2])) winningCombo = [0, 0, 2, 2];
+        if (equal(board[2][0], board[1][1], board[0][2])) winningCombo = [2, 0, 0, 2];
     }
 
-    if (winningCombo === null && equal(board[0][0], board[1][1], board[2][2]))
-        winningCombo = [0, 0, 2, 2];
-    if (winningCombo === null && equal(board[2][0], board[1][1], board[0][2]))
-        winningCombo = [2, 0, 0, 2];
-
-    // Winning line animation
     if (winningCombo !== null) {
         winLineProgress = min(winLineProgress + 0.05, 1);
         let eased = easeOutCubic(winLineProgress);
@@ -678,70 +619,40 @@ function draw() {
         strokeWeight(4);
         line(x1, y1, cx2, cy2);
 
-        // Wait for all cell animations to finish before ending the game
         let animating = false;
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                if (cellAnimating[i][j]) animating = true;
-            }
-        }
+        for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (cellAnimating[i][j]) animating = true;
+        
         if (winLineProgress >= 1 && !gameEnded && !animating) {
             gameEnded = true;
             stopTimer();
             totalGames++;
             let winner = board[winningCombo[0]][winningCombo[1]];
-            if (winner === ai) {
-                scoreAI++;
-                streakAI++;
-                streakYou = 0;
-                if (streakAI > bestStreakAI) bestStreakAI = streakAI;
+            if (winner === bot) {
+                scoreBot++; streakBot++; streakYou = 0;
+                if (streakBot > bestStreakBot) bestStreakBot = streakBot;
                 sndLose();
                 showResult('<span class="winner-x">X wins!</span> Better luck next time 🤖');
-                bumpScore('scoreAI');
+                bumpScore('scoreBot');
             } else {
-                scoreYou++;
-                streakYou++;
-                streakAI = 0;
+                scoreYou++; streakYou++; streakBot = 0;
                 if (streakYou > bestStreakYou) bestStreakYou = streakYou;
                 sndWin();
                 showResult('<span class="winner-o">O wins!</span> Impressive! 🎉');
                 bumpScore('scoreYou');
                 spawnConfetti(45);
             }
-            updateScoreboard();
-            updateStats();
-            updateTurnIndicator();
-            // Save scores immediately after game ends
-            saveState();
-            noLoop();
+            updateScoreboard(); updateStats(); updateTurnIndicator(); saveState(); noLoop();
         }
     } else {
         let emptyGrid = 0;
-        for (let i = 0; i < 3; i++)
-            for (let j = 0; j < 3; j++)
-                if (board[i][j] == '') emptyGrid++;
-        // Wait for all cell animations to finish before ending the game
+        for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (board[i][j] == '') emptyGrid++;
         let animating = false;
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                if (cellAnimating[i][j]) animating = true;
-            }
-        }
+        for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (cellAnimating[i][j]) animating = true;
+        
         if (emptyGrid == 0 && !gameEnded && !animating) {
-            gameEnded = true;
-            stopTimer();
-            totalGames++;
-            scoreTie++;
-            streakAI = 0;
-            streakYou = 0;
-            sndTie();
-            showResult('<span class="tie-text">It\'s a Tie!</span> Well played 🤓');
-            updateScoreboard();
-            updateStats();
-            updateTurnIndicator();
-            // Save scores immediately after game ends
-            saveState();
-            noLoop();
+            gameEnded = true; stopTimer(); totalGames++; scoreTie++; streakBot = 0; streakYou = 0;
+            sndTie(); showResult('<span class="tie-text">It\'s a Tie!</span> Well played 🤓');
+            updateScoreboard(); updateStats(); updateTurnIndicator(); saveState(); noLoop();
         }
     }
 }

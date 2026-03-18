@@ -19,7 +19,6 @@
     <link rel="icon" type="image/png" href="favicon.png" />
 
     <style>
-      /* Wrapper to hold ads and game without touching game internal styles */
       .ads-main-container {
         display: flex;
         justify-content: center;
@@ -31,39 +30,27 @@
         padding: 10px;
         box-sizing: border-box;
       }
-
-      /* Sidebar Ad Styles */
       .side-ad-container {
         flex: 1;
-        max-width: 300px; /* Fits standard skyscraper ads */
+        max-width: 300px;
         min-width: 160px;
-        margin-top: 100px; /* Matches game board vertical position */
+        margin-top: 100px;
       }
-
-      /* Bottom Ad for Mobile */
       .mobile-footer-ad {
         display: none;
         width: 100%;
         text-align: center;
         margin-top: 20px;
       }
-
-      /* Responsive logic: Hide sides on small screens, show bottom ad */
       @media (max-width: 1200px) {
-        .side-ad-container {
-          display: none;
-        }
-        .mobile-footer-ad {
-          display: block;
-        }
+        .side-ad-container { display: none; }
+        .mobile-footer-ad { display: block; }
       }
     </style>
   </head>
 
   <body>
-    
     <div class="ads-main-container">
-      
       <aside class="side-ad-container">
         <ins class="adsbygoogle"
              style="display:block"
@@ -119,10 +106,10 @@
         </div>
 
         <div class="scoreboard">
-          <div class="score-item score-ai">
+          <div class="score-item score-bot">
             <span class="score-label">Bot</span>
-            <span class="score-value" id="scoreAI">0</span>
-            <span class="score-streak" id="streakAI"></span>
+            <span class="score-value" id="scoreBot">0</span>
+            <span class="score-streak" id="streakBot"></span>
           </div>
           <div class="score-item score-tie">
             <span class="score-label">Ties</span>
@@ -176,7 +163,6 @@
                data-full-width-responsive="true"></ins>
           <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
         </div>
-
       </div>
 
       <aside class="side-ad-container">
@@ -188,7 +174,6 @@
              data-full-width-responsive="true"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </aside>
-
     </div>
 
     <script src="minimax.js"></script>
